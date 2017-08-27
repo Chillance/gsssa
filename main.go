@@ -70,10 +70,16 @@ func (g *gsssa) encrypt() {
 		os.Exit(1)
 	}
 
+	counter := 0
 	for _, c := range combined {
+		counter++
 
 		count := len(c) / 44
 		var buff bytes.Buffer
+		comment := fmt.Sprintf("# Share %d\n", counter)
+		fmt.Print(comment)
+		f.WriteString(comment)
+
 		for j := 0; j < count; j++ {
 			part := c[j*44 : (j+1)*44]
 			bytedata, err := base64.URLEncoding.DecodeString(part)
@@ -94,6 +100,11 @@ func (g *gsssa) encrypt() {
 		fmt.Println()
 		f.WriteString("\n")
 	}
+
+	comment := fmt.Sprintf("# You need %d shares out of these %d shares to be able to get back your secret.\n", g.createMin, g.createAmount)
+	fmt.Print(comment)
+	f.WriteString(comment)
+
 	f.Close()
 }
 
@@ -117,6 +128,12 @@ func (g *gsssa) decrypt() {
 	var shares []string
 	fullStr := ""
 	for _, s := range seeds {
+
+		if len(s) > 0 && s[0] == '#' {
+			fullStr = ""
+			continue
+		}
+
 		if len(s) == 0 {
 			if len(fullStr) > 0 {
 				shares = append(shares, fullStr)
