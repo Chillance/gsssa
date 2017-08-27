@@ -184,5 +184,7 @@ func main() {
 	reveal.Flag("dictionary", "The word list file. Should have at least 256 words in it. Separated by a newline. Make sure this is the same wordlist used when created the shares. (Currently only the first 256 ones are used.)").Default("english.txt").StringVar(&g.dictionary)
 	reveal.Flag("file", "Filename of the file containing the shares.").Short('f').Default("shares.txt").StringVar(&g.sharesFilename)
 
+	app.Version("Git Commit: " + os.Getenv("GIT_COMMIT"))
+
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 }
