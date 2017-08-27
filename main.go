@@ -101,9 +101,11 @@ func (g *gsssa) encrypt() {
 		f.WriteString("\n")
 	}
 
-	comment := fmt.Sprintf("# You need %d shares out of these %d shares to be able to get back your secret.\n", g.createMin, g.createAmount)
+	comment := fmt.Sprintf("# You need %d shares out of these %d shares to be able to get your secret back.\n", g.createMin, g.createAmount)
 	fmt.Print(comment)
 	f.WriteString(comment)
+
+	fmt.Printf("\n The file \"%s\" is now created with above shown information.\n\n", g.sharesFilename)
 
 	f.Close()
 }
