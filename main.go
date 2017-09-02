@@ -27,19 +27,22 @@ var (
 
 func (g *gsssa) getWordsFromDictionary() []string {
 
-	wordsData, err := ioutil.ReadFile(g.dictionary)
-	if err != nil {
-		fmt.Printf("%+v\n", err)
-		os.Exit(1)
+	if len(g.dictionary) > 0 {
+		wordsData, err := ioutil.ReadFile(g.dictionary)
+		if err != nil {
+			fmt.Printf("%+v\n", err)
+			os.Exit(1)
+		}
+
+		words := strings.Split(string(wordsData), "\n")
+		if len(words) <= 255 {
+			fmt.Printf("\""+g.dictionary+"\" needs to have at least 256 words. It only has: %d\n", len(words))
+			os.Exit(1)
+		}
+		return words
 	}
 
-	words := strings.Split(string(wordsData), "\n")
-	if len(words) <= 255 {
-		fmt.Printf("\""+g.dictionary+"\" needs to have at least 256 words. It only has: %d\n", len(words))
-		os.Exit(1)
-	}
-
-	return words
+	return embeddedWords
 }
 
 func (g *gsssa) encrypt() {
@@ -171,7 +174,7 @@ func main() {
 	})
 	create.Flag("min", "Minimum shares that are needed.").Default("2").IntVar(&g.createMin)
 	create.Flag("amount", "Amount of shares to generate.").Default("3").IntVar(&g.createAmount)
-	create.Flag("dictionary", "The word list file. Should have at least 256 words in it. Separated by a newline. (Currently only the first 256 ones are used.)").Default("english.txt").StringVar(&g.dictionary)
+	create.Flag("dictionary", "The word list file. Should have at least 256 words in it. Separated by a newline. (Currently only the first 256 ones are used.)").StringVar(&g.dictionary)
 	create.Flag("file", "Filename of the file containing the shares.").Short('f').Default("shares.txt").StringVar(&g.sharesFilename)
 	create.Flag("force", "Overwrite file with shares.").BoolVar(&g.forceOverwrite)
 	create.Arg("secret", "The secret string to hide.").Required().StringVar(&g.createSecret)
@@ -181,7 +184,7 @@ func main() {
 		return nil
 	})
 
-	reveal.Flag("dictionary", "The word list file. Should have at least 256 words in it. Separated by a newline. Make sure this is the same wordlist used when created the shares. (Currently only the first 256 ones are used.)").Default("english.txt").StringVar(&g.dictionary)
+	reveal.Flag("dictionary", "The word list file. Should have at least 256 words in it. Separated by a newline. Make sure this is the same wordlist used when created the shares. (Currently only the first 256 ones are used.)").StringVar(&g.dictionary)
 	reveal.Flag("file", "Filename of the file containing the shares.").Short('f').Default("shares.txt").StringVar(&g.sharesFilename)
 
 	app.Version("Git Commit: " + os.Getenv("GIT_COMMIT"))
