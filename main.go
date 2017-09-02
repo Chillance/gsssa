@@ -22,7 +22,9 @@ type gsssa struct {
 }
 
 var (
-	app = kingpin.New("gsssa", "A command-line Shamir's Secret Sharing application.\nThis will generate a text file with word groups. Two rows with text next to eachother form a share. Keep these two groups together when splitting shares up!")
+	app        = kingpin.New("gsssa", "A command-line Shamir's Secret Sharing application.\nThis will generate a text file with word groups. Two rows with text next to eachother form a share. Keep these two groups together when splitting shares up!")
+	buildstamp = "None"
+	githash    = "None"
 )
 
 func (g *gsssa) getWordsFromDictionary() []string {
@@ -187,7 +189,7 @@ func main() {
 	reveal.Flag("dictionary", "The word list file. Should have at least 256 words in it. Separated by a newline. Make sure this is the same wordlist used when created the shares. (Currently only the first 256 ones are used.)").StringVar(&g.dictionary)
 	reveal.Flag("file", "Filename of the file containing the shares.").Short('f').Default("shares.txt").StringVar(&g.sharesFilename)
 
-	app.Version("Git Commit: " + os.Getenv("GIT_COMMIT"))
+	app.Version("Git Version: " + githash + "\nBuild: " + buildstamp + "\n")
 
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 }
